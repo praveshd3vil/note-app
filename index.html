@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Note App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: rgb(17, 17, 85);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .note-input {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+        }
+
+        .note-input input {
+            width: 100%;
+            padding: 12px;
+            font-size: 18px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            transition: border-color 0.3s;
+        }
+
+        .note-input input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .note-input textarea {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            min-height: 120px;
+            resize: vertical;
+            font-family: inherit;
+            margin-bottom: 15px;
+            transition: border-color 0.3s;
+        }
+
+        .note-input textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .add-btn {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            background: rgb(17, 17, 85);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .notes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .note-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+        }
+
+        .note-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+
+        .note-card h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+            word-wrap: break-word;
+        }
+
+        .note-card p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            word-wrap: break-word;
+        }
+
+        .note-card .date {
+            font-size: 0.85em;
+            color: #999;
+            margin-bottom: 15px;
+        }
+
+        .delete-btn {
+            padding: 8px 16px;
+            background: #ff4757;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .delete-btn:hover {
+            background: #ff3838;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: white;
+            font-size: 1.2em;
+            margin-top: 50px;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📝 My Notes</h1>
+        
+        <div class="note-input">
+            <input type="text" id="noteTitle" placeholder="Note title...">
+            <textarea id="noteContent" placeholder="Write your note here..."></textarea>
+            <button class="add-btn" onclick="addNote()">Add Note</button>
+        </div>
+
+        <div class="notes-grid" id="notesContainer"></div>
+    </div>
+
+    <script>
+        let notes = [];
+
+        function loadNotes() {
+            const saved = JSON.parse(localStorage.getItem('notes') || '[]');
+            notes = saved;
+            renderNotes();
+        }
+
+        function saveNotes() {
+            localStorage.setItem('notes', JSON.stringify(notes));
+        }
+
+        function addNote() {
+            const title = document.getElementById('noteTitle').value.trim();
+            const content = document.getElementById('noteContent').value.trim();
+
+            if (!title && !content) {
+                alert('Please enter a title or content for your note!');
+                return;
+            }
+
+            const note = {
+                id: Date.now(),
+                title: title || 'Untitled Note',
+                content: content,
+                date: new Date().toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'short', 
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                })
+            };
+
+            notes.unshift(note);
+            saveNotes();
+            renderNotes();
+
+            document.getElementById('noteTitle').value = '';
+            document.getElementById('noteContent').value = '';
+        }
+
+        function deleteNote(id) {
+            if (confirm('Are you sure you want to delete this note?')) {
+                notes = notes.filter(note => note.id !== id);
+                saveNotes();
+                renderNotes();
+            }
+        }
+
+        function renderNotes() {
+            const container = document.getElementById('notesContainer');
+        
+            container.innerHTML = notes.map(note => `
+                <div class="note-card">
+                    <h3>${note.title}</h3>
+                    <p>${note.content}</p>
+                    <div class="date">${note.date}</div>
+                    <button class="delete-btn" onclick="deleteNote(${note.id})">Delete</button>
+                </div>
+            `).join('');
+        }
+
+        document.getElementById('noteTitle').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                document.getElementById('noteContent').focus();
+            }
+        });
+
+        document.getElementById('noteContent').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                addNote();
+            }
+        });
+
+        loadNotes();
+    </script>
+</body>
+</html>
