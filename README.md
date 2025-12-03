@@ -177,7 +177,7 @@ Deploy to any static hosting service:
 - Firebase Hosting
 
 ## Vercel Link
-  - https://note-gzhrqyrxm-praveshd3vils-projects.vercel.app/
+  - (https://note-app-one-peach.vercel.app/)
 
 ## 🛠️ Future Enhancements
 
