@@ -243,4 +243,4 @@ For questions or issues:
 **Made with ❤️ for simple and effective note-taking**
 
 **Version**: 1.0.0  
-**Last Updated**: 2024
+**Last Updated**: 2025
